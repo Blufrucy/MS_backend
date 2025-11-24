@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.msBackend.mapper.UserMapper">
+<!--注册-->
+    <insert id="register">
+        INSERT INTO user (username, password, nickname, phone, email)
+        VALUES (#{username}, #{password}, #{nickname}, #{phone}, #{email})
+    </insert>
+
+    <!--查找用户动态sql-->
+    <select id="finUser" resultType="com.example.msBackend.pojo.User">
+        SELECT id, username, password, nickname, phone, email, avatar
+        FROM user
+        <where>
+            <!-- 用户名非空则匹配 -->
+            <if test="username != null and username != ''">
+                username = #{username}
+            </if>
+            <!-- 手机号非空则匹配（用OR连接，需加<choose>/<trim>或手动处理） -->
+            <if test="phone != null and phone != ''">
+                OR phone = #{phone}
+            </if>
+            <!-- 邮箱非空则匹配 -->
+            <if test="email != null and email != ''">
+                OR email = #{email}
+            </if>
+        </where>
+        <!-- 最多返回1条（用户名/手机号/邮箱都是唯一索引） -->
+        LIMIT 1
+    </select>
+</mapper>

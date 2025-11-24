@@ -1,0 +1,50 @@
+spring:
+  profiles:
+    active: dev
+    #mybatis 分页插件
+  mail:
+    host: smtp.qq.com
+    username: 1265868946@qq.com
+    password: dgiozjgftytcdcdi
+    port: 465
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true  # QQ邮箱推荐启用SSL
+            required: true
+          auth: true  # 必须开启SMTP认证（关键配置，之前缺失）
+        debug: true  # 开启debug，方便排查发送错误
+  scheduling:
+    enabled: true  # 启用定时任务（验证码清理）
+  data:
+    redis:
+      host: ${management.redis.host}
+      port: ${management.redis.port}
+      database: ${management.redis.database}
+      connect-timeout: 10s
+      password: ${management.redis.password}
+
+  datasource:
+    driver-class-name: ${management.datasource.driver-class-name}
+    username: ${management.datasource.username}
+    password: ${management.datasource.password}
+    url: jdbc:mysql://${management.datasource.host}:${management.datasource.port}/${management.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:Mapper/*.xml
+  type-aliases-package: com.example.blog.Entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+server:
+  port: 8080
+
+# Token配置（替换原JWT配置）
+token:
+  expire: 604800        # Token过期时间（秒，一周）
+  prefix: "user:token:" # Redis中Token的key前缀
+
+
+
