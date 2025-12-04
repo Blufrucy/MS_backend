@@ -3,6 +3,7 @@ package com.example.msBackend.service.impl;
 import com.example.msBackend.Util.RedisAccountUtil;
 import com.example.msBackend.mapper.UserMapper;
 import com.example.msBackend.pojo.User;
+import com.example.msBackend.pojo.Vo.ResultVo;
 import com.example.msBackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,5 +40,18 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         return u;
+    }
+
+    @Override
+    public User findById(Long id) {
+        return userMapper.findById(id);
+    }
+
+    @Override
+    public ResultVo<User> updateUser(User user) {
+        userMapper.update(user);
+        User updatedUser = userMapper.findById(user.getId());
+        updatedUser.setPassword("***");
+        return ResultVo.success(updatedUser);
     }
 }

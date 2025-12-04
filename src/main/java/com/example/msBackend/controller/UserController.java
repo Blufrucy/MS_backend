@@ -1,10 +1,11 @@
 package com.example.msBackend.controller;
 
-import com.example.msBackend.Util.RedisAccountUtil;
+import com.example.msBackend.Util.EmailVerificationUtil;
 import com.example.msBackend.Util.TokenUtil;
 import com.example.msBackend.pojo.User;
 import com.example.msBackend.pojo.Vo.ResultVo;
 import com.example.msBackend.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EmailVerificationUtil emailVerificationUtil;
     @PostMapping("register")
     public ResultVo register(@RequestBody User user){
         Boolean b =  userService.register(user);
@@ -38,5 +42,60 @@ public class UserController {
         u.setToken(token);
         u.setPassword("***");
         return ResultVo.success(u);
+    }
+
+    @GetMapping("user/info")
+    public ResultVo getUserInfo(HttpServletRequest request) {
+        String userId = (String) request.getAttribute("userId");
+
+        if (userId == null) {
+            return ResultVo.error("无法获取用户信息");
+        }
+
+        User user = userService.findById(Long.parseLong(userId));
+
+        if (user == null) {
+            return ResultVo.error("用户不存在");
+        }
+
+        // 隐藏密码
+        user.setPassword("***");
+
+        return ResultVo.success(user);
+    }
+
+    @PostMapping("sendVerificationCode")
+    public ResultVo sendVerificationCode(@RequestParam String email) {
+        String code = emailVerificationUtil.generateVerificationCode();
+        boolean success = emailVerificationUtil.sendVerificationCode(email, code);
+
+        if (success) {
+            return ResultVo.success("验证码发送成功");
+        } else {
+            return ResultVo.error("验证码发送失败");
+        }
+    }
+
+    @PostMapping("verifyCode")
+    public ResultVo verifyCode(@RequestParam String email, @RequestParam String code) {
+        boolean isValid = emailVerificationUtil.verifyCode(email, code);
+
+        if (isValid) {
+            return ResultVo.success("验证码验证成功");
+        } else {
+            return ResultVo.error("验证码错误或已过期");
+        }
+    }
+
+    @PutMapping("user/update")
+    public ResultVo updateUser(@RequestBody User user, HttpServletRequest request) {
+        String userId = (String) request.getAttribute("userId");
+
+        if (userId == null) {
+            return ResultVo.error("无法获取用户信息");
+        }
+
+        user.setId(Long.parseLong(userId));
+        return userService.updateUser(user);
     }
 }
