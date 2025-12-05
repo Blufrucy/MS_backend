@@ -1,15 +1,15 @@
 management:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    host: localhost
+    host: 42.121.255.254
     port: 3306
-    database: ms
+    database: MS
     username: root
-    password: 20041220qQ#
+    password: guet123
   redis:
-    host: localhost
+    host: 42.121.255.254
     port: 6379
     database: 1
-    password:
+    password: Redis@Pass123
 
 
