@@ -24,6 +24,7 @@ public class UserController {
     private EmailVerificationUtil emailVerificationUtil;
     @PostMapping("register")
     public ResultVo register(@RequestBody User user){
+        System.out.println("接收到的用户数据: " + user); // 添加这行日志
         Boolean b =  userService.register(user);
         if(b){
             return ResultVo.success(user);
@@ -44,7 +45,7 @@ public class UserController {
         return ResultVo.success(u);
     }
 
-    @GetMapping("user/info")
+    @GetMapping("me")
     public ResultVo getUserInfo(HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId");
 
