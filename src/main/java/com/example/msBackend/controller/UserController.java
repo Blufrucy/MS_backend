@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/auth/")
 public class UserController {
     @Autowired
     private TokenUtil tokenUtil;
@@ -39,7 +39,7 @@ public class UserController {
             return ResultVo.error("账号或密码错误");
         }
         String token = tokenUtil.generateToken();
-        tokenUtil.saveTokenToRedis(token,1);
+        tokenUtil.saveTokenToRedis(token,u.getId());
         u.setToken(token);
         u.setPassword("***");
         return ResultVo.success(u);

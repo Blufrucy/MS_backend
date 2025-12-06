@@ -36,6 +36,7 @@ public class TokenUtil {
     public void saveTokenToRedis(String token, long userId) {
         log.info("Token过期时间：{}秒", expireSeconds);
         log.info("Redis Token前缀：{}", tokenPrefix);
+        log.info(">>> 存入Redis的完整key={}", tokenPrefix + token);
         stringRedisTemplate.opsForValue()
                 .set(tokenPrefix + token, String.valueOf(userId), expireSeconds, TimeUnit.SECONDS);
     }
@@ -44,6 +45,7 @@ public class TokenUtil {
      * 校验Token有效性（移除static）
      */
     public boolean validateToken(String token) {
+        log.info(">>> 校验时查找的key={}", tokenPrefix + token);
         return stringRedisTemplate.hasKey(tokenPrefix + token);
     }
 
