@@ -22,7 +22,7 @@ public class TokenInterceptor implements HandlerInterceptor {
 
         // 1. 跳过无需校验的路径
         String requestURI = request.getRequestURI();
-        if (requestURI.startsWith("/api/auth/login") || requestURI.contains("/swagger/")) {
+        if (requestURI.startsWith("/api/auth/login") || requestURI.startsWith("/api/auth/register") || requestURI.contains("/swagger/")) {
             return true;
         }
 

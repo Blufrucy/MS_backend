@@ -88,7 +88,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("user/update")
+    @PutMapping("update")
     public ResultVo updateUser(@RequestBody User user, HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId");
 
