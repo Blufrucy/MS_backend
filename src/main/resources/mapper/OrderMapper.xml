@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.msBackend.mapper.OrderMapper">
+
+    <!-- 根据订单号查询订单 -->
+    <select id="findByOrderNo" resultType="com.example.msBackend.pojo.Order">
+        SELECT id, order_no, user_id, product_id, seckill_product_id, 
+               product_name, quantity, total_amount, status, image_url,
+               created_at, payment_time, update_time
+        FROM `order`
+        WHERE order_no = #{orderNo}
+    </select>
+
+    <!-- 根据订单ID查询订单 -->
+    <select id="findById" resultType="com.example.msBackend.pojo.Order">
+        SELECT id, order_no, user_id, product_id, seckill_product_id, 
+               product_name, quantity, total_amount, status, image_url,
+               created_at, payment_time, update_time
+        FROM `order`
+        WHERE id = #{orderId}
+    </select>
+
+    <!-- 根据用户ID查询订单列表 -->
+    <select id="findByUserId" resultType="com.example.msBackend.pojo.Order">
+        SELECT id, order_no, user_id, product_id, seckill_product_id, 
+               product_name, quantity, total_amount, status, image_url,
+               created_at, payment_time, update_time
+        FROM `order`
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 创建订单 -->
+    <insert id="insert" parameterType="com.example.msBackend.pojo.Order" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `order` (order_no, user_id, product_id, seckill_product_id, 
+                           product_name, quantity, total_amount, status, image_url,
+                           created_at, update_time)
+        VALUES (#{orderNo}, #{userId}, #{productId}, #{seckillProductId}, 
+                #{productName}, #{quantity}, #{totalAmount}, #{status}, #{imageUrl},
+                #{createdAt}, #{updateTime})
+    </insert>
+
+    <!-- 更新订单状态 -->
+    <update id="updateStatus" parameterType="com.example.msBackend.pojo.Order">
+        UPDATE `order`
+        SET status = #{status},
+            payment_time = #{paymentTime},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 取消订单 -->
+    <update id="cancelOrder">
+        UPDATE `order`
+        SET status = 2,
+            update_time = NOW()
+        WHERE id = #{orderId}
+    </update>
+
+</mapper>
