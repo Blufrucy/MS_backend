@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.msBackend.mapper.PaymentMapper">
+
+    <!-- 根据订单号查询支付记录 -->
+    <select id="findByOrderNo" resultType="com.example.msBackend.pojo.Payment">
+        SELECT id, order_no, user_id, payment_type, amount, paid, 
+               payment_time, callback_data, create_time, update_time
+        FROM payment
+        WHERE order_no = #{orderNo}
+    </select>
+
+    <!-- 插入支付记录 -->
+    <insert id="insert" parameterType="com.example.msBackend.pojo.Payment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO payment (order_no, user_id, payment_type, amount, paid, 
+                           payment_time, callback_data, create_time, update_time)
+        VALUES (#{orderNo}, #{userId}, #{paymentType}, #{amount}, #{paid}, 
+                #{paymentTime}, #{callbackData}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 更新支付记录 -->
+    <update id="update" parameterType="com.example.msBackend.pojo.Payment">
+        UPDATE payment
+        SET paid = #{paid},
+            payment_time = #{paymentTime},
+            callback_data = #{callbackData},
+            update_time = #{updateTime}
+        WHERE order_no = #{orderNo}
+    </update>
+
+</mapper>
