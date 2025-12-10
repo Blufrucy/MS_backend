@@ -1,6 +1,7 @@
 package com.example.msBackend.controller;
 
 import com.example.msBackend.Util.EmailVerificationUtil;
+import com.example.msBackend.Util.MinioUtils;
 import com.example.msBackend.Util.TokenUtil;
 import com.example.msBackend.pojo.User;
 import com.example.msBackend.pojo.Vo.ResultVo;
@@ -33,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("login")
-    public ResultVo login(@RequestBody User user){
+    public ResultVo login(@RequestBody User user) {
         User u = userService.login(user);
         if(u==null){
             return ResultVo.error("账号或密码错误");
