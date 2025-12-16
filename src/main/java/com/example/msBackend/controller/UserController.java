@@ -10,6 +10,9 @@ import com.example.msBackend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.UUID;
 
 
 @CrossOrigin
@@ -95,15 +98,49 @@ public class UserController {
         }
     }
 
+    /**
+     * 更新用户资料（含头像）
+     * @param user    要更新的字段（JSON）
+     * @param file    头像文件（可选）
+     * @param request 请求
+     * @return 更新结果
+     */
     @PostMapping("update")
-    public ResultVo updateUser(@RequestBody User user, HttpServletRequest request) {
-        String userId = (String) request.getAttribute("userId");
+    public ResultVo updateUser(@RequestPart(value = "user", required = false) User user,
+                               @RequestPart(value = "file", required = false) MultipartFile file,
+                               HttpServletRequest request) {
 
+        // 1. 统一取出 userId
+        String userId = (String) request.getAttribute("userId");
         if (userId == null) {
             return ResultVo.error("无法获取用户信息");
         }
+        long id = Long.parseLong(userId);
 
-        user.setId(Long.parseLong(userId));
+        // 2. 如果上传了头像，先处理文件
+        if (file != null && !file.isEmpty()) {
+            try {
+                String fileName = "avatar/" + userId + "/" + UUID.randomUUID() + ".jpg";
+                String avatarUrl = MinioUtils.uploadMultipartFile(file, fileName);
+
+                // 保证 user 对象存在
+                if (user == null) {
+                    user = new User();
+                }
+                user.setAvatar(avatarUrl);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResultVo.error("头像上传失败: " + e.getMessage());
+            }
+        }
+
+        // 3. 如果 user 为空，说明客户端啥也没传，直接报错
+        if (user == null) {
+            return ResultVo.error("缺少更新内容");
+        }
+
+        // 4. 补全 id 并调用 Service
+        user.setId(id);
         return userService.updateUser(user);
     }
 
