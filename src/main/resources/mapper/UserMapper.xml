@@ -29,4 +29,59 @@
         <!-- 最多返回1条（用户名/手机号/邮箱都是唯一索引） -->
         LIMIT 1
     </select>
+
+
+    <!-- 原有ResultMap保持不变 -->
+    <resultMap id="ProductResultMap" type="com.example.msBackend.pojo.Product">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="original_price" property="originalPrice"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+
+
+    <!-- 商品分页查询（支持名称模糊搜索，无 LIMIT） -->
+    <select id="listProductsByName" resultMap="ProductResultMap">
+        SELECT * FROM product
+        <where>
+            <if test="productName != null and productName != ''">
+                name LIKE CONCAT('%', #{productName}, '%')
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 秒杀商品ResultMap（扩展关联商品字段） -->
+    <resultMap id="SeckillProductResultMap" type="com.example.msBackend.pojo.Vo.SeckillProductVO">
+        <id column="id" property="id"/>
+        <result column="product_id" property="productId"/>
+        <result column="seckill_price" property="seckillPrice"/>
+        <result column="stock" property="stock"/>
+        <result column="available_stock" property="availableStock"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_image_url" property="productImageUrl"/>
+        <result column="seckill_description" property="seckillDescription"/>
+    </resultMap>
+    <!-- 秒杀商品分页查询（关联商品表，查询名称、图片） -->
+    <select id="listSeckillProductsByName" resultMap="SeckillProductResultMap">
+        SELECT sp.*, p.name AS product_name, p.image_url AS product_image_url
+        FROM seckill_product sp
+        LEFT JOIN product p ON sp.product_id = p.id
+        <where>
+            <if test="seckillProductName != null and seckillProductName != ''">
+                p.name LIKE CONCAT('%', #{seckillProductName}, '%')
+            </if>
+        </where>
+        ORDER BY sp.start_time DESC
+    </select>
 </mapper>

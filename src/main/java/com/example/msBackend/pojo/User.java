@@ -12,4 +12,5 @@ public class User {
     private String email;
     private String avatar;
     private String token;
+    private String code;//注册验证码
 }

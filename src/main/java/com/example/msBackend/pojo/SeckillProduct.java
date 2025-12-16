@@ -49,6 +49,8 @@ public class SeckillProduct {
      * 状态（非空，默认0：0-未开始，1-进行中，2-已结束）
      */
     private Byte status = 0; // 匹配表中 default 0
+    // 新增：秒杀商品描述
+    private String seckillDescription;
 
     /**
      * 创建时间（默认当前时间，可为空）

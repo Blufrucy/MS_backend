@@ -17,8 +17,10 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(tokenInterceptor)
                 .addPathPatterns("/**") // 拦截所有路径
                 .excludePathPatterns(
-                        "/api/auth/**",           // 排除登录/注册等路径
-                        "/api/pay/callback/**"    // 排除支付回调接口（第三方调用）
+                        "/api/auth/base/**",           // 排除登录/注册等路径
+                        "/api/pay/callback/**" ,   // 排除支付回调接口（第三方调用）
+                        "/admin/**"
+
                 );
     }
 }

@@ -3,7 +3,8 @@ package com.example.msBackend.controller;
 import com.example.msBackend.Util.EmailVerificationUtil;
 import com.example.msBackend.Util.MinioUtils;
 import com.example.msBackend.Util.TokenUtil;
-import com.example.msBackend.pojo.User;
+import com.example.msBackend.pojo.*;
+import com.example.msBackend.pojo.Vo.PageResult;
 import com.example.msBackend.pojo.Vo.ResultVo;
 import com.example.msBackend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,9 +24,14 @@ public class UserController {
 
     @Autowired
     private EmailVerificationUtil emailVerificationUtil;
-    @PostMapping("register")
+    @PostMapping("/base/register")
     public ResultVo register(@RequestBody User user){
         System.out.println("接收到的用户数据: " + user); // 添加这行日志
+
+        boolean isValid = emailVerificationUtil.verifyCode(user.getEmail(), user.getCode());
+        if (!isValid){
+            return ResultVo.error("验证码错误或已过期");
+        }
         Boolean b =  userService.register(user);
         if(b){
             return ResultVo.success(user);
@@ -33,7 +39,7 @@ public class UserController {
         return ResultVo.error("注册失败,用户已存在");
     }
 
-    @PostMapping("login")
+    @PostMapping("/base/login")
     public ResultVo login(@RequestBody User user) {
         User u = userService.login(user);
         if(u==null){
@@ -66,7 +72,7 @@ public class UserController {
         return ResultVo.success(user);
     }
 
-    @PostMapping("sendVerificationCode")
+    @PostMapping("/base/sendVerificationCode")
     public ResultVo sendVerificationCode(@RequestParam String email) {
         String code = emailVerificationUtil.generateVerificationCode();
         boolean success = emailVerificationUtil.sendVerificationCode(email, code);
@@ -78,7 +84,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("verifyCode")
+    @PostMapping("/base/verifyCode")
     public ResultVo verifyCode(@RequestParam String email, @RequestParam String code) {
         boolean isValid = emailVerificationUtil.verifyCode(email, code);
 
@@ -89,7 +95,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("update")
+    @PostMapping("update")
     public ResultVo updateUser(@RequestBody User user, HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId");
 
@@ -100,4 +106,25 @@ public class UserController {
         user.setId(Long.parseLong(userId));
         return userService.updateUser(user);
     }
+
+
+
+    /**
+     * 分页查询商品（支持名称模糊搜索）
+     * 不传productName则查询全部商品
+     */
+    @PostMapping("/base/product/page")
+    public ResultVo<PageResult<Product>> listProductsByPage(@RequestBody ProductPageQuery query) {
+        return userService.listProductsByPage(query);
+    }
+
+    /**
+     * 分页查询秒杀商品（支持关联商品名称模糊搜索）
+     * 不传seckillProductName则查询全部秒杀商品
+     */
+    @PostMapping("/base/seckillProduct/page")
+    public ResultVo listSeckillProductsByPage(@RequestBody SeckillProductPageQuery query) {
+        return userService.listSeckillProductsByPage(query);
+    }
+
 }
