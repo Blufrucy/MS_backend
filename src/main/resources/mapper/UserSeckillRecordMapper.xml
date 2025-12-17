@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.msBackend.mapper.UserSeckillRecordMapper">
+    <sql id="Base_Column_List">
+        id, user_id, seckill_product_id, create_time
+    </sql>
+
+    <!-- 新增秒杀记录 -->
+    <insert id="insert" parameterType="UserSeckillRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_seckill_record (
+            user_id, seckill_product_id, create_time
+        ) VALUES (
+                     #{userId}, #{seckillProductId}, NOW()
+                 )
+    </insert>
+
+    <!-- 查询用户是否已抢购 -->
+    <select id="selectByUserIdAndSeckillId" parameterType="map" resultType="UserSeckillRecord">
+        SELECT <include refid="Base_Column_List"/>
+        FROM user_seckill_record
+        WHERE user_id = #{userId}
+        AND seckill_product_id = #{seckillProductId}
+    </select>
+</mapper>

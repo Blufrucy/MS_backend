@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.msBackend.mapper.SeckillProductMapper">
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, product_id, seckill_price, stock, available_stock, start_time, end_time,
+        status, seckill_description, create_time, update_time
+    </sql>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" parameterType="java.lang.Long" resultType="SeckillProduct">
+        SELECT <include refid="Base_Column_List"/>
+        FROM seckill_product
+        WHERE id = #{id}
+    </select>
+
+    <!-- 乐观锁更新库存（仅当可用库存 >= 扣减数量时更新） -->
+    <update id="updateAvailableStock" parameterType="map">
+        UPDATE seckill_product
+        SET available_stock = available_stock - #{num},
+            update_time = NOW()
+        WHERE id = #{id}
+          AND available_stock >= #{num}
+    </update>
+
+    <!-- 更新秒杀状态 -->
+    <update id="updateStatusByTime" parameterType="map">
+        UPDATE seckill_product
+        SET status = #{status},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper>

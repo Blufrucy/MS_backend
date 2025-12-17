@@ -58,4 +58,44 @@
         WHERE id = #{orderId}
     </update>
 
+    <sql id="Base_Column_List">
+        id, order_no, user_id, product_id, seckill_product_id,
+    product_name, quantity, total_amount, status, image_url,
+    created_at, payment_time, update_time
+    </sql>
+
+    <!-- 根据订单编号查询 -->
+    <select id="selectByOrderNo" parameterType="java.lang.String" resultType="Order">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `order`
+        WHERE order_no = #{orderNo}
+    </select>
+
+    <!-- 根据用户ID和秒杀商品ID查询 -->
+    <select id="selectByUserIdAndSeckillId" parameterType="map" resultType="Order">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `order`
+        WHERE user_id = #{userId}
+        AND seckill_product_id = #{seckillProductId}
+    </select>
+
+    <!-- 更新支付状态 -->
+    <update id="updatePaymentStatus" parameterType="map">
+        UPDATE `order`
+        SET status = #{status},
+            payment_time = #{paymentTime},
+            update_time = NOW()
+        WHERE order_no = #{orderNo}
+    </update>
+
+    <!-- 查询用户未支付订单 -->
+    <select id="selectUnpaidByUserId" parameterType="java.lang.Long" resultType="Order">
+        SELECT <include refid="Base_Column_List"/>
+        FROM `order`
+        WHERE user_id = #{userId}
+        AND status = 0
+    </select>
+
+
+
 </mapper>

@@ -3,6 +3,7 @@ package com.example.msBackend.mapper;
 import com.example.msBackend.pojo.Order;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -37,4 +38,26 @@ public interface OrderMapper {
      * 取消订单
      */
     void cancelOrder(Long orderId);
+
+
+
+    /**
+     * 根据订单编号查询
+     */
+    Order selectByOrderNo( String orderNo);
+
+    /**
+     * 根据用户ID和秒杀商品ID查询订单
+     */
+    Order selectByUserIdAndSeckillId( Long userId, Long seckillProductId);
+
+    /**
+     * 更新订单支付状态
+     */
+    int updatePaymentStatus( String orderNo,  Integer status,  LocalDateTime paymentTime);
+
+    /**
+     * 查询用户未支付订单
+     */
+    List<Order> selectUnpaidByUserId( Long userId);
 }

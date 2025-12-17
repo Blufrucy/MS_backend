@@ -19,7 +19,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/api/auth/base/**",           // 排除登录/注册等路径
                         "/api/pay/callback/**" ,   // 排除支付回调接口（第三方调用）
-                        "/admin/**"
+                        "/admin/**",
+                        "/seckill/base/**"
 
                 );
     }
