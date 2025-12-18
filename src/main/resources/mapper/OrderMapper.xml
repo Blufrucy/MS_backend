@@ -5,7 +5,7 @@
 
     <!-- 根据订单号查询订单 -->
     <select id="findByOrderNo" resultType="com.example.msBackend.pojo.Order">
-        SELECT id, order_no, user_id, product_id, seckill_product_id, 
+        SELECT id, order_no, user_id, product_id, seckill_product_id, address_id,
                product_name, quantity, total_amount, status, image_url,
                created_at, payment_time, update_time
         FROM `order`
@@ -14,7 +14,7 @@
 
     <!-- 根据订单ID查询订单 -->
     <select id="findById" resultType="com.example.msBackend.pojo.Order">
-        SELECT id, order_no, user_id, product_id, seckill_product_id, 
+        SELECT id, order_no, user_id, product_id, seckill_product_id, address_id,
                product_name, quantity, total_amount, status, image_url,
                created_at, payment_time, update_time
         FROM `order`
@@ -23,7 +23,7 @@
 
     <!-- 根据用户ID查询订单列表 -->
     <select id="findByUserId" resultType="com.example.msBackend.pojo.Order">
-        SELECT id, order_no, user_id, product_id, seckill_product_id, 
+        SELECT id, order_no, user_id, product_id, seckill_product_id, address_id,
                product_name, quantity, total_amount, status, image_url,
                created_at, payment_time, update_time
         FROM `order`
@@ -33,12 +33,42 @@
 
     <!-- 创建订单 -->
     <insert id="insert" parameterType="com.example.msBackend.pojo.Order" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO `order` (order_no, user_id, product_id, seckill_product_id, 
-                           product_name, quantity, total_amount, status, image_url,
-                           created_at, update_time)
-        VALUES (#{orderNo}, #{userId}, #{productId}, #{seckillProductId}, 
-                #{productName}, #{quantity}, #{totalAmount}, #{status}, #{imageUrl},
-                #{createdAt}, #{updateTime})
+        INSERT INTO `order` (
+            order_no, 
+            user_id, 
+            product_id, 
+            <if test="seckillProductId != null">
+                seckill_product_id,
+            </if>
+            <if test="addressId != null">
+                address_id,
+            </if>
+            product_name, 
+            quantity, 
+            total_amount, 
+            status, 
+            image_url,
+            created_at, 
+            update_time
+        )
+        VALUES (
+            #{orderNo}, 
+            #{userId}, 
+            #{productId}, 
+            <if test="seckillProductId != null">
+                #{seckillProductId},
+            </if>
+            <if test="addressId != null">
+                #{addressId},
+            </if>
+            #{productName}, 
+            #{quantity}, 
+            #{totalAmount}, 
+            #{status}, 
+            #{imageUrl},
+            #{createdAt}, 
+            NOW()
+        )
     </insert>
 
     <!-- 更新订单状态 -->

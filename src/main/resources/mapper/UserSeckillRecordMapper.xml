@@ -22,4 +22,11 @@
         WHERE user_id = #{userId}
         AND seckill_product_id = #{seckillProductId}
     </select>
+
+    <!-- 删除用户秒杀记录（用于取消订单时恢复抢购资格） -->
+    <delete id="deleteByUserIdAndSeckillId">
+        DELETE FROM user_seckill_record
+        WHERE user_id = #{userId}
+        AND seckill_product_id = #{seckillProductId}
+    </delete>
 </mapper>
