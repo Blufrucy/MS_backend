@@ -115,7 +115,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    public Long doSeckill(Long seckillProductId, Long userId, Integer quantity) {
+    public Long doSeckill(Long seckillProductId, Long userId, Integer quantity, Integer addressId) {
         // 1. 执行Lua脚本
         String stockKey = String.format(SECKILL_STOCK_KEY, seckillProductId);
         String userKey = String.format(SECKILL_USER_KEY, seckillProductId);
@@ -140,6 +140,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
             message.setQuantity(quantity);
             message.setTotalAmount(seckillProduct.getSeckillPrice().multiply(new BigDecimal(quantity)));
             message.setImageUrl(product.getImageUrl());
+            message.setAddressId(addressId); // 设置收货地址ID
 
             // 投递到Redis List队列（左推）
             redisTemplate.opsForList().leftPush(SECKILL_ORDER_QUEUE, message);
@@ -170,36 +171,71 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     // 事务性创建订单
     @Transactional(rollbackFor = Exception.class)
     public void createOrder(OrderMessage message) {
-        // 1. 生成订单编号
-        String orderNo = "SK"+UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+        try {
+            System.out.println("========== 开始创建订单 ==========");
+            System.out.println("用户ID: " + message.getUserId());
+            System.out.println("秒杀商品ID: " + message.getSeckillProductId());
+            System.out.println("商品名称: " + message.getProductName());
+            System.out.println("数量: " + message.getQuantity());
+            System.out.println("地址ID: " + message.getAddressId());
 
-        // 2. 插入订单
-        Order order = new Order();
-        order.setOrderNo(orderNo);
-        order.setUserId(message.getUserId());
-        order.setProductId(message.getProductId());
-        order.setSeckillProductId(message.getSeckillProductId());
-        order.setProductName(message.getProductName());
-        order.setQuantity(message.getQuantity());
-        order.setTotalAmount(message.getTotalAmount());
-        order.setStatus((byte) 0); // 待支付
-        order.setImageUrl(message.getImageUrl());
-        order.setCreatedAt(LocalDateTime.now());
-        orderMapper.insert(order);
+            // 1. 生成订单编号
+            String orderNo = "SK" + UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+            System.out.println("生成订单号: " + orderNo);
 
-        // 3. 插入用户秒杀记录（数据库唯一索引防重复）
-        UserSeckillRecord record = new UserSeckillRecord();
-        record.setUserId(message.getUserId());
-        record.setSeckillProductId(message.getSeckillProductId());
-        userSeckillRecordMapper.insert(record);
+            // 2. 插入订单
+            Order order = new Order();
+            order.setOrderNo(orderNo);
+            order.setUserId(message.getUserId());
+            order.setProductId(message.getProductId());
+            order.setSeckillProductId(message.getSeckillProductId());
+            order.setProductName(message.getProductName());
+            order.setQuantity(message.getQuantity());
+            order.setTotalAmount(message.getTotalAmount());
+            order.setStatus((byte) 0); // 待支付
+            order.setImageUrl(message.getImageUrl());
+            order.setAddressId(message.getAddressId()); // 设置收货地址ID
+            order.setCreatedAt(LocalDateTime.now());
+            orderMapper.insert(order);
+            System.out.println("订单插入成功");
 
-        // 4. 乐观锁更新数据库库存
-        int affectRows = seckillProductMapper.updateAvailableStock(message.getSeckillProductId(), message.getQuantity());
-        if (affectRows == 0) {
-            // 库存不足：回滚Redis库存
-            String stockKey = String.format(SECKILL_STOCK_KEY, message.getSeckillProductId());
-            stringRedisTemplate.opsForValue().increment(stockKey, message.getQuantity());
-            throw new RuntimeException("库存不足，下单失败");
+            // 3. 检查是否已有秒杀记录
+            UserSeckillRecord existingRecord = userSeckillRecordMapper.selectByUserIdAndSeckillId(
+                    message.getUserId(), 
+                    message.getSeckillProductId()
+            );
+            
+            if (existingRecord != null) {
+                System.out.println("警告：用户秒杀记录已存在，ID: " + existingRecord.getId());
+                // 记录已存在，可能是之前取消订单时没有删除成功
+                // 这里不抛出异常，继续执行
+            } else {
+                // 3. 插入用户秒杀记录（数据库唯一索引防重复）
+                UserSeckillRecord record = new UserSeckillRecord();
+                record.setUserId(message.getUserId());
+                record.setSeckillProductId(message.getSeckillProductId());
+                userSeckillRecordMapper.insert(record);
+                System.out.println("秒杀记录插入成功");
+            }
+
+            // 4. 乐观锁更新数据库库存
+            int affectRows = seckillProductMapper.updateAvailableStock(message.getSeckillProductId(), message.getQuantity());
+            System.out.println("库存更新影响行数: " + affectRows);
+            
+            if (affectRows == 0) {
+                // 库存不足：回滚Redis库存
+                String stockKey = String.format(SECKILL_STOCK_KEY, message.getSeckillProductId());
+                stringRedisTemplate.opsForValue().increment(stockKey, message.getQuantity());
+                System.out.println("库存不足，回滚Redis库存");
+                throw new RuntimeException("库存不足，下单失败");
+            }
+            
+            System.out.println("========== 订单创建成功 ==========");
+        } catch (Exception e) {
+            System.err.println("========== 订单创建失败 ==========");
+            System.err.println("错误信息: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
 }

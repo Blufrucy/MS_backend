@@ -14,4 +14,5 @@ public class OrderMessage implements Serializable {
     private Integer quantity;
     private BigDecimal totalAmount;
     private String imageUrl;
+    private Integer addressId; // 收货地址ID
 }

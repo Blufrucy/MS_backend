@@ -12,7 +12,8 @@ public interface SeckillActivityService {
      * @param seckillProductId 秒杀商品ID
      * @param userId 用户ID
      * @param quantity 购买数量
+     * @param addressId 收货地址ID
      * @return 秒杀结果（0:库存不足,1:成功,2:已抢购）
      */
-    Long doSeckill(Long seckillProductId, Long userId, Integer quantity);
+    Long doSeckill(Long seckillProductId, Long userId, Integer quantity, Integer addressId);
 }

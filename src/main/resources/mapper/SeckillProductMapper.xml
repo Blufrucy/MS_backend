@@ -31,4 +31,12 @@
             update_time = NOW()
         WHERE id = #{id}
     </update>
+
+    <!-- 恢复库存（用于取消订单） -->
+    <update id="restoreStock" parameterType="map">
+        UPDATE seckill_product
+        SET available_stock = available_stock + #{num},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
 </mapper>

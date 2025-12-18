@@ -23,4 +23,12 @@ public interface SeckillProductMapper {
      * 更新秒杀商品状态（根据时间自动更新）
      */
     int updateStatusByTime(@Param("id") Long id, @Param("status") Integer status);
+
+    /**
+     * 恢复库存（用于取消订单）
+     * @param id 秒杀商品ID
+     * @param num 恢复数量
+     * @return 影响行数
+     */
+    int restoreStock(@Param("id") Long id, @Param("num") Integer num);
 }

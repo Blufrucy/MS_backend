@@ -23,19 +23,21 @@ public class SeckillActivityController {
     }
 
     /**
-     *
-     * @param seckillProductId
-     * @param request
+     * 秒杀下单
+     * @param seckillProductId 秒杀商品ID
+     * @param request HTTP请求
      * @param quantity 购买数量
+     * @param addressId 收货地址ID
      * @return
      */
     @PostMapping("doSeckill")
     public ResultVo doSeckill(
             @RequestParam Long seckillProductId,
             HttpServletRequest request,
-            @RequestParam Integer quantity) {
+            @RequestParam Integer quantity,
+            @RequestParam(required = false) Integer addressId) {
         String userId = (String) request.getAttribute("userId");
-        Long result = seckillActivityService.doSeckill(seckillProductId, Long.valueOf(userId), quantity);
+        Long result = seckillActivityService.doSeckill(seckillProductId, Long.valueOf(userId), quantity, addressId);
         if (result == 0) {
             return ResultVo.error("手慢了，库存不足");
         } else if (result == 1) {

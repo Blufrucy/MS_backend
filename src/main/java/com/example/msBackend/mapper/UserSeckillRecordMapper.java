@@ -14,4 +14,9 @@ public interface UserSeckillRecordMapper {
      * 查询用户是否已抢购该商品
      */
     UserSeckillRecord selectByUserIdAndSeckillId( Long userId, Long seckillProductId);
+
+    /**
+     * 删除用户秒杀记录（用于取消订单时恢复抢购资格）
+     */
+    int deleteByUserIdAndSeckillId(Long userId, Long seckillProductId);
 }
