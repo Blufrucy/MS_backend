@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("seckill")
+@RequestMapping("/api/seckill")
 public class SeckillActivityController {
     @Autowired
     private SeckillActivityService seckillActivityService;

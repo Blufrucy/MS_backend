@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 public class AdminController {
     @Autowired
     private AdminService adminService;
