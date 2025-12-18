@@ -267,4 +267,52 @@ public class AdminServiceImpl implements AdminService {
             return ResultVo.error("查询秒杀商品列表失败：" + e.getMessage());
         }
     }
+
+    @Override
+    public ResultVo updateSeckillProductStatus(Long id, Byte status) {
+        try {
+            if (id == null || id <= 0) {
+                return ResultVo.error("秒杀商品ID不合法");
+            }
+            if (status == null || (status != 0 && status != 1)) {
+                return ResultVo.error("状态参数错误");
+            }
+            // 校验秒杀商品是否存在
+            SeckillProduct seckillProduct = adminMapper.getSeckillProductById(id);
+            if (seckillProduct == null) {
+                return ResultVo.error("秒杀商品不存在");
+            }
+            // 更新状态
+            adminMapper.updateSeckillProductStatus(id, status);
+            return ResultVo.success("状态更新成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultVo.error("更新状态失败：" + e.getMessage());
+        }
+    }
+
+    @Override
+    public ResultVo getMonitorStats() {
+        try {
+            // 获取统计数据
+            Long totalUsers = adminMapper.getTotalUsers();
+            Long totalOrders = adminMapper.getTotalOrders();
+            BigDecimal totalSales = adminMapper.getTotalSales();
+            Long currentOnline = adminMapper.getCurrentOnlineUsers();
+            List<java.util.Map<String, Object>> topProducts = adminMapper.getTopProducts();
+
+            // 构建返回数据
+            java.util.Map<String, Object> stats = new java.util.HashMap<>();
+            stats.put("totalUsers", totalUsers != null ? totalUsers : 0);
+            stats.put("totalOrders", totalOrders != null ? totalOrders : 0);
+            stats.put("totalSales", totalSales != null ? totalSales : BigDecimal.ZERO);
+            stats.put("currentOnline", currentOnline != null ? currentOnline : 0);
+            stats.put("topProducts", topProducts != null ? topProducts : new java.util.ArrayList<>());
+
+            return ResultVo.success(stats);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultVo.error("获取监控统计失败：" + e.getMessage());
+        }
+    }
 }
