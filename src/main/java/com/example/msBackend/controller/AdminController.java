@@ -160,6 +160,61 @@ public class AdminController {
         return adminService.listSeckillProducts(status);
     }
 
+    // ========== RESTful 风格秒杀商品接口 ==========
+    /**
+     * 添加秒杀商品（RESTful风格）
+     * POST /api/admin/seckill/products
+     */
+    @PostMapping("/seckill/products")
+    public ResultVo addSeckillProductRestful(@RequestBody SeckillProduct seckillProduct) {
+        ResultVo result = adminService.addSeckillProduct(seckillProduct);
+        if (result.getCode() == 200 && result.getData() != null) {
+            // 返回格式：{"code": 200, "message": "添加成功", "data": {"id": 1}}
+            return ResultVo.success("添加成功", new java.util.HashMap<String, Object>() {{
+                put("id", result.getData());
+            }});
+        }
+        return result;
+    }
+
+    /**
+     * 更新秒杀商品（RESTful风格）
+     * PUT /api/admin/seckill/products/{id}
+     */
+    @PutMapping("/seckill/products/{id}")
+    public ResultVo updateSeckillProductRestful(@PathVariable Long id, @RequestBody SeckillProduct seckillProduct) {
+        seckillProduct.setId(id);
+        ResultVo result = adminService.updateSeckillProduct(seckillProduct);
+        if (result.getCode() == 200) {
+            return ResultVo.success("更新成功", new java.util.HashMap<String, Object>() {{
+                put("id", id);
+            }});
+        }
+        return result;
+    }
+
+    /**
+     * 秒杀商品状态管理
+     * PUT /api/admin/seckill/products/{id}/status
+     */
+    @PutMapping("/seckill/products/{id}/status")
+    public ResultVo updateSeckillProductStatus(@PathVariable Long id, @RequestBody java.util.Map<String, Integer> request) {
+        Integer status = request.get("status");
+        if (status == null || (status != 0 && status != 1)) {
+            return ResultVo.error("状态参数错误，必须为0(下架)或1(上架)");
+        }
+        return adminService.updateSeckillProductStatus(id, status.byteValue());
+    }
+
+    /**
+     * 系统监控统计
+     * GET /api/admin/monitor/stats
+     */
+    @GetMapping("/monitor/stats")
+    public ResultVo getMonitorStats() {
+        return adminService.getMonitorStats();
+    }
+
     // ========== 私有工具方法：上传图片到MinIO ==========
     private String uploadImageToMinio(MultipartFile file) throws Exception {
         // 1. 校验文件

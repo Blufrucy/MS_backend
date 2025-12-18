@@ -67,5 +67,34 @@ public interface AdminMapper {
      */
     List<SeckillProduct> listSeckillProducts(Byte status);
 
+    /**
+     * 更新秒杀商品状态
+     */
+    void updateSeckillProductStatus(Long id, Byte status);
+
+    /**
+     * 获取用户总数
+     */
+    Long getTotalUsers();
+
+    /**
+     * 获取订单总数
+     */
+    Long getTotalOrders();
+
+    /**
+     * 获取总销售额
+     */
+    java.math.BigDecimal getTotalSales();
+
+    /**
+     * 获取当前在线用户数（简化实现：返回总用户数的10%作为模拟）
+     */
+    Long getCurrentOnlineUsers();
+
+    /**
+     * 获取热销商品TOP榜
+     */
+    List<java.util.Map<String, Object>> getTopProducts();
 
 }

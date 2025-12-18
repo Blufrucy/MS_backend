@@ -21,6 +21,14 @@ public class ResultVo<T> {
         return result;
     }
 
+    public static <T> ResultVo<T> success(String message, T object) {
+        ResultVo<T> result = new ResultVo<T>();
+        result.msg = message;
+        result.data = object;
+        result.code = 200;
+        return result;
+    }
+
     public static <T> ResultVo<T> error(String msg) {
         ResultVo<T> result = new ResultVo<T>();
         result.msg = msg;

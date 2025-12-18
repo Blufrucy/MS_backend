@@ -122,4 +122,46 @@
         ORDER BY start_time DESC
     </select>
 
+    <!-- 更新秒杀商品状态 -->
+    <update id="updateSeckillProductStatus">
+        UPDATE seckill_product
+        SET status = #{status}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- ========== 系统监控统计SQL ========== -->
+    <!-- 获取用户总数 -->
+    <select id="getTotalUsers" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM user
+    </select>
+
+    <!-- 获取订单总数 -->
+    <select id="getTotalOrders" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM `order`
+    </select>
+
+    <!-- 获取总销售额（已支付订单） -->
+    <select id="getTotalSales" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(total_amount), 0) FROM `order` WHERE status = 1
+    </select>
+
+    <!-- 获取当前在线用户数（简化实现：返回总用户数的15%作为模拟） -->
+    <select id="getCurrentOnlineUsers" resultType="java.lang.Long">
+        SELECT FLOOR(COUNT(*) * 0.15) FROM user
+    </select>
+
+    <!-- 获取热销商品TOP5 -->
+    <select id="getTopProducts" resultType="java.util.HashMap">
+        SELECT 
+            p.id AS productId,
+            p.name AS productName,
+            COUNT(o.id) AS sales
+        FROM `order` o
+        INNER JOIN product p ON o.product_id = p.id
+        WHERE o.status = 1
+        GROUP BY p.id, p.name
+        ORDER BY sales DESC
+        LIMIT 5
+    </select>
+
 </mapper>
