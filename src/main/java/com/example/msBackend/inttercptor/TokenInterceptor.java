@@ -20,30 +20,53 @@ public class TokenInterceptor implements HandlerInterceptor {
         log.info("========== TokenInterceptor start ==========");
         log.info("URI = {}", request.getRequestURI());
 
-        // 1. 跳过无需校验的路径
+        // 1. 跳过无需校验的路径（这些路径已在 WebConfig 中配置，但这里再次检查以确保安全）
         String requestURI = request.getRequestURI();
-        if (requestURI.startsWith("/api/auth/base/login") || requestURI.startsWith("/api/auth/base/register") || requestURI.contains("/swagger/")) {
+        if (requestURI.startsWith("/api/auth/base/") || 
+            requestURI.startsWith("/api/pay/callback/") ||
+            requestURI.startsWith("/admin/") ||
+            requestURI.startsWith("/seckill/base/") ||
+            requestURI.contains("/swagger/")) {
+            log.info(">>> 跳过Token验证，路径: {}", requestURI);
             return true;
         }
 
-        // 2. 从请求头获取Token（约定：Authorization: Bearer {token}）
+        // 2. 从请求头获取Token
         String authHeader = request.getHeader("Authorization");
         log.info(">>> Authorization header = {}", authHeader);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")){
-            log.warn(">>> Token格式错误，header={}", authHeader);
+        
+        // 如果没有 Authorization 头，直接返回 401
+        if (authHeader == null || authHeader.isEmpty()) {
+            log.warn(">>> Token不存在");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"code\":401,\"msg\":\"未登录，请先登录\"}");
+            return false;
+        }
+        
+        // 支持两种格式：Bearer {token} 或直接 {token}
+        String token;
+        if (authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7).trim();
+        } else {
+            token = authHeader.trim();
+        }
+        
+        if (token.isEmpty()) {
+            log.warn(">>> Token为空");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write("{\"code\":401,\"msg\":\"Token不存在或格式错误\"}");
             return false;
         }
 
-        // 3. 提取Token并校验（Redis中是否存在）
-        String token = authHeader.substring(7).trim();
+        // 3. 校验Token（Redis中是否存在）
         log.info(">>> 前端传来的token={}", token);
         if (!tokenUtil.validateToken(token)) {
+            log.warn(">>> Token无效或已过期");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":401,\"msg\":\"Token已过期或无效\"}");
+            response.getWriter().write("{\"code\":401,\"msg\":\"Token已过期或无效，请重新登录\"}");
             return false;
         }
 

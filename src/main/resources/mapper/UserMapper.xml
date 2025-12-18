@@ -13,16 +13,16 @@
         SELECT id, username, password, nickname, phone, email, avatar
         FROM user
         <where>
-            <!-- 用户名非空则匹配 -->
+            <!-- 支持用户名、邮箱、手机号任意一种方式查询 -->
             <if test="username != null and username != ''">
-                username = #{username}
+                (username = #{username} OR email = #{username} OR phone = #{username})
             </if>
-            <!-- 手机号非空则匹配（用OR连接，需加<choose>/<trim>或手动处理） -->
-            <if test="phone != null and phone != ''">
+            <!-- 如果单独传了手机号 -->
+            <if test="phone != null and phone != '' and (username == null or username == '')">
                 OR phone = #{phone}
             </if>
-            <!-- 邮箱非空则匹配 -->
-            <if test="email != null and email != ''">
+            <!-- 如果单独传了邮箱 -->
+            <if test="email != null and email != '' and (username == null or username == '')">
                 OR email = #{email}
             </if>
         </where>

@@ -29,15 +29,32 @@ public class UserController {
     private EmailVerificationUtil emailVerificationUtil;
     @PostMapping("/base/register")
     public ResultVo register(@RequestBody User user){
-        System.out.println("接收到的用户数据: " + user); // 添加这行日志
+        System.out.println("接收到的用户数据: " + user);
 
+        // TODO: 开发环境临时禁用验证码验证，生产环境需要启用
+        // 如果需要启用验证码，请先配置好邮箱服务，然后取消下面的注释
+        /*
         boolean isValid = emailVerificationUtil.verifyCode(user.getEmail(), user.getCode());
         if (!isValid){
             return ResultVo.error("验证码错误或已过期");
         }
-        Boolean b =  userService.register(user);
+        */
+        
+        Boolean b = userService.register(user);
         if(b){
-            return ResultVo.success(user);
+            // 注册成功后，user 对象已经包含了系统生成的 username
+            // 隐藏密码，返回用户信息（包含 username）
+            user.setPassword("***");
+            
+            // 构建返回信息
+            java.util.Map<String, Object> result = new java.util.HashMap<>();
+            result.put("username", user.getUsername());
+            result.put("nickname", user.getNickname());
+            result.put("email", user.getEmail());
+            result.put("phone", user.getPhone());
+            result.put("message", "注册成功！您的用户名是：" + user.getUsername());
+            
+            return ResultVo.success(result);
         }
         return ResultVo.error("注册失败,用户已存在");
     }
