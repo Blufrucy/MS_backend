@@ -54,4 +54,14 @@ public interface AdminService {
      * 查询秒杀商品列表
      */
     ResultVo listSeckillProducts(Byte status);
+
+    /**
+     * 更新秒杀商品状态
+     */
+    ResultVo updateSeckillProductStatus(Long id, Byte status);
+
+    /**
+     * 获取系统监控统计数据
+     */
+    ResultVo getMonitorStats();
 }
