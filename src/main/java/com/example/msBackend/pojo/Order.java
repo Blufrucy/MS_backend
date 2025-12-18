@@ -61,6 +61,8 @@ public class Order {
      */
     private String imageUrl;
 
+    private Integer addressId;
+
     /**
      * 创建时间（默认当前时间，可为空）
      * 注：数据库用 datetime，Java 推荐用 LocalDateTime（JDK8+），兼容时间处理

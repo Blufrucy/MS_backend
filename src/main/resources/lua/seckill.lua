@@ -5,9 +5,9 @@
 -- ARGV[2]：购买数量
 
 -- 1. 检查用户是否已抢购
-if redis.call('SISMEMBER', KEYS[2], ARGV[1]) == 1 then
-    return 2 -- 已抢购
-end
+--if redis.call('SISMEMBER', KEYS[2], ARGV[1]) == 1 then
+--    return 2 -- 已抢购
+--end
 
 -- 2. 检查库存是否充足
 local stock = tonumber(redis.call('GET', KEYS[1]))

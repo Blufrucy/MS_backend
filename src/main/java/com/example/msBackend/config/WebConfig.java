@@ -20,7 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/auth/base/**",           // 排除用户登录/注册等路径
                         "/api/admin/auth/**",          // 排除管理员登录接口
                         "/api/pay/callback/**",        // 排除支付回调接口（第三方调用）
-                        "/api/seckill/base/**"         // 排除秒杀预热接口（无需登录）
+                        "/api/seckill/base/**" ,        // 排除秒杀预热接口（无需登录）
+                        "/api/Order/**"
                 );
     }
 }

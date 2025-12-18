@@ -59,7 +59,7 @@
     </update>
 
     <sql id="Base_Column_List">
-        id, order_no, user_id, product_id, seckill_product_id,
+        id, address_id,order_no, user_id, product_id, seckill_product_id,
     product_name, quantity, total_amount, status, image_url,
     created_at, payment_time, update_time
     </sql>
@@ -87,6 +87,26 @@
             update_time = NOW()
         WHERE order_no = #{orderNo}
     </update>
+<!--    修改订单信息-->
+    <update id="updateOrder">
+        UPDATE `order`
+        SET
+        status = IFNULL(#{status}, status),
+        payment_time = IFNULL(#{paymentTime}, payment_time),
+        address_id = IFNULL(#{addressId}, address_id),
+        product_name = IFNULL(#{productName}, product_name),
+        quantity = IFNULL(#{quantity}, quantity),
+        total_amount = IFNULL(#{totalAmount}, total_amount),
+        image_url = IFNULL(#{imageUrl}, image_url),
+        update_time = NOW()
+        WHERE
+        order_no = #{orderNo}
+        <!-- 双重校验：订单编号非空 + 主键非空（可选） -->
+        AND #{orderNo} IS NOT NULL
+        <if test="id != null">
+            AND id = #{id}
+        </if>
+    </update>
 
     <!-- 查询用户未支付订单 -->
     <select id="selectUnpaidByUserId" parameterType="java.lang.Long" resultType="Order">
@@ -95,7 +115,18 @@
         WHERE user_id = #{userId}
         AND status = 0
     </select>
+<!--    获取全部订单-->
+    <select id="listOrder" resultType="com.example.msBackend.pojo.Order">
+        SELECT *
+        FROM `order`
+    </select>
 
+
+    <select id="selectOrderByUserId" resultType="com.example.msBackend.pojo.Order">
+        SELECT *
+        FROM `order`
+        WHERE user_id = #{userId}
+    </select>
 
 
 </mapper>

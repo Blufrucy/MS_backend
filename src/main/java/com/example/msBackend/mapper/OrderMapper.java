@@ -8,7 +8,10 @@ import java.util.List;
 
 @Mapper
 public interface OrderMapper {
-    
+
+
+    List<Order>  selectOrderByUserId(long userId);
+
     /**
      * 根据订单号查询订单
      */
@@ -60,4 +63,8 @@ public interface OrderMapper {
      * 查询用户未支付订单
      */
     List<Order> selectUnpaidByUserId( Long userId);
+
+     void updateOrder(Order order);
+
+    List<Order> listOrder();
 }
