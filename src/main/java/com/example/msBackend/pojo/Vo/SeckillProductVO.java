@@ -14,4 +14,6 @@ public class SeckillProductVO extends SeckillProduct {
     private String productName;
     // 关联商品图片URL
     private String productImageUrl;
+    // 关联商品原价
+    private Double originalPrice;
 }

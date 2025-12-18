@@ -70,11 +70,12 @@
         <result column="update_time" property="updateTime"/>
         <result column="product_name" property="productName"/>
         <result column="product_image_url" property="productImageUrl"/>
+        <result column="original_price" property="originalPrice"/>
         <result column="seckill_description" property="seckillDescription"/>
     </resultMap>
-    <!-- 秒杀商品分页查询（关联商品表，查询名称、图片） -->
+    <!-- 秒杀商品分页查询（关联商品表，查询名称、图片、原价） -->
     <select id="listSeckillProductsByName" resultMap="SeckillProductResultMap">
-        SELECT sp.*, p.name AS product_name, p.image_url AS product_image_url
+        SELECT sp.*, p.name AS product_name, p.image_url AS product_image_url, p.original_price AS original_price
         FROM seckill_product sp
         LEFT JOIN product p ON sp.product_id = p.id
         <where>
